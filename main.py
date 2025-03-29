@@ -15,13 +15,13 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH,
                                   constants.SCREEN_HEIGHT))
 states = {
-    "MENU": Menu(),
-    "SPLASH": Splash(),
+    # "MENU": Menu(),
+    # "SPLASH": Splash(),
     "GAMEPLAY": Gameplay(),
     "GAME_OVER": GameOver(),
 }
 
-game = Game(screen, states, "SPLASH")
+game = Game(screen, states, "GAMEPLAY")
 game.run()
 pygame.quit()
 sys.exit()
