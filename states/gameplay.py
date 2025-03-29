@@ -4,6 +4,7 @@ import spritesheet
 import constants
 from starfield import StarField
 
+from simple_reflex_agent import SimpleReflexAgent
 from .base_state import BaseState
 from sprites.player import Player
 from sprites.rocket import Rocket
@@ -48,7 +49,8 @@ class Gameplay(BaseState):
         self.enemies = 0
         self.number_of_enemies = 13
         self.score = 0
-        self.high_score = 0
+        with open("highscores.txt","r") as f:
+                self.high_score = int(f.readline())
         self.freeze = False
 
         self.all_enemies = pygame.sprite.Group()
@@ -57,7 +59,9 @@ class Gameplay(BaseState):
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
+        self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
+
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
@@ -77,6 +81,7 @@ class Gameplay(BaseState):
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
+        self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
 
     def add_control_points(self):
@@ -89,6 +94,14 @@ class Gameplay(BaseState):
                     self.control_points1, self.mover))
 
     def get_event(self, event):
+        if len(self.all_rockets) < 2:
+            self.shoot_rocket()
+
+        if (self.agent.check_boundary()):
+            self.agent.move_player()
+        else:
+            self.agent.reset_player()
+        
         for entity in self.all_sprites:
             entity.get_event(event)
 
@@ -149,6 +162,7 @@ class Gameplay(BaseState):
 
             if start_rocket[1] < 400:
                 ySpeed = 7
+                # get player position to calculate trajectory for rocket
                 dx = self.player.rect.centerx - start_rocket[0]
                 dy = self.player.rect.centery - start_rocket[1]
 
@@ -158,6 +172,8 @@ class Gameplay(BaseState):
                 rocket = Rocket(self.sprites, xSpeed, ySpeed)
                 rocket.rect.centerx = start_rocket[0]
                 rocket.rect.centery = start_rocket[1]
+
+                # print(rocket, rocket.rect.centerx, rocket.rect.centery)
 
                 self.enemy_rockets.add(rocket)
                 self.all_sprites.add(rocket)
@@ -201,6 +217,9 @@ class Gameplay(BaseState):
             self.kill_sound.play()
             self.freeze = True
             self.player.kill()
+            # TODO fix high scores for later
+            with open("highscores.txt","a") as f:
+                f.write(str(self.high_score) + "\n")
 
     def drawPath(self, screen):
         calculator = PathPointCalculator()
