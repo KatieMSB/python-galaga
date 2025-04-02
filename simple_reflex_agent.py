@@ -48,22 +48,21 @@ class SimpleReflexAgent:
 
     def reset_player(self):
         print(self.enemies)
-        # pick a random enemy
-        # pick the first enemy
-        # pick the last enemy
         # reset to center of screen
         width, _ = pygame.display.get_surface().get_size()
         center = width / 2
-        # for enemy in self.enemies:
-        #     center = enemy.rect.x
-        #     break
-        # count = 0
-        # for enemy in self.enemies:
-        #     if count == len(self.enemies) - 1:
-        #         center = enemy.rect.x
-        #     count += 1
         if len(self.enemies):
             count = 0
+            # pick the first enemy
+            # for enemy in self.enemies:
+            #     center = enemy.rect.x
+            #     break
+            # pick the last enemy
+            # for enemy in self.enemies:
+            #     if count == len(self.enemies) - 1:
+            #         center = enemy.rect.x
+            #     count += 1
+            # pick a random enemy
             random_int = random.randint(0, len(self.enemies) - 1)
             for enemy in self.enemies:
                 if count == random_int:

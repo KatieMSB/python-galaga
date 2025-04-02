@@ -1,3 +1,4 @@
+import sys
 import pygame
 import constants
 
@@ -41,3 +42,14 @@ class Game(object):
             self.update(dt)
             self.draw()
             pygame.display.update()
+    
+
+    def run_one_frame(self, dt):
+        """Runs a single frame of the game (instead of full control)"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        self.state.update(dt)  # Pass dt to update()
+        self.state.draw(self.screen)  # Render game
