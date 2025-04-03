@@ -20,7 +20,14 @@ ADDENEMY = pygame.USEREVENT + 1
 ENEMYSHOOTS = pygame.USEREVENT + 2
 FREEZE = pygame.USEREVENT + 3
 
-
+def read_scores():
+    integer_list = []
+    with open("highscores.txt", 'r') as file:
+        for line in file:
+            linestr = line.strip().split(",")
+            integer_list.append(int(linestr[0]))
+    integer_list.sort(reverse=True)
+    return integer_list
 class Gameplay(BaseState):
     def __init__(self):
         super(Gameplay, self).__init__()
@@ -49,8 +56,10 @@ class Gameplay(BaseState):
         self.enemies = 0
         self.number_of_enemies = 13
         self.score = 0
-        with open("highscores.txt","r") as f:
-                self.high_score = int(f.readline())
+        scores = read_scores()
+        self.high_score = 0
+        if len(scores):
+            self.high_score = scores[0]
         self.freeze = False
 
         self.all_enemies = pygame.sprite.Group()
@@ -61,7 +70,6 @@ class Gameplay(BaseState):
         self.show_control = False
         self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
-
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
@@ -217,9 +225,8 @@ class Gameplay(BaseState):
             self.kill_sound.play()
             self.freeze = True
             self.player.kill()
-            # TODO fix high scores for later
-            with open("highscores.txt","a") as f:
-                f.write(str(self.high_score) + "\n")
+            if self.score > self.high_score:
+                self.high_score = self.score
 
     def drawPath(self, screen):
         calculator = PathPointCalculator()

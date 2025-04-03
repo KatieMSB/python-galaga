@@ -12,8 +12,15 @@ class Game(object):
         self.states = states
         self.state_name = start_state
         self.state = self.states[self.state_name]
+        self.sethighscore = False
+
 
     def event_loop(self):
+        if self.state_name == "GAME_OVER" and not self.sethighscore:
+            self.sethighscore = True
+            with open("highscores.txt","a") as f:
+                f.write(str(self.states["GAMEPLAY"].score)+","+str(self.clock.get_time())+"\n")
+        
         for event in pygame.event.get():
             self.state.get_event(event)
 
@@ -42,14 +49,3 @@ class Game(object):
             self.update(dt)
             self.draw()
             pygame.display.update()
-    
-
-    def run_one_frame(self, dt):
-        """Runs a single frame of the game (instead of full control)"""
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        self.state.update(dt)  # Pass dt to update()
-        self.state.draw(self.screen)  # Render game

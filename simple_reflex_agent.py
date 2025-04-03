@@ -20,8 +20,6 @@ class SimpleReflexAgent:
         pass
 
     def check_boundary(self):
-        print(len(self.rockets))
-
         for rocket in self.rockets:
             distance_x = rocket.rect.centerx - self.player.rect.centerx
             distance_y = rocket.rect.centery - self.player.rect.centery
