@@ -40,7 +40,8 @@ class Game(object):
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        self.state.draw(self.screen)
+        print("draw", self.state_name)
+        self.state.draw(self.screen, self.states["GAMEPLAY"].score)
 
     def run(self):
         while not self.done:

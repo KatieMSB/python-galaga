@@ -28,7 +28,8 @@ class GameOver(BaseState):
             elif event.key == pygame.K_ESCAPE:
                 self.quit = True
 
-    def draw(self, surface):
+    def draw(self, surface, highscore):
         surface.fill(pygame.Color("black"))
-        surface.blit(self.title, self.title_rect)
-        surface.blit(self.instructions, self.instructions_rect)
+        # surface.blit(self.title, self.title_rect)
+        
+        surface.blit(self.font.render(str(highscore), True, pygame.Color("white")), self.title_rect)

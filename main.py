@@ -29,7 +29,7 @@ def run_game():
 if __name__ == "__main__":
     multiprocessing.set_start_method("spawn") 
     
-    num_games = 20
+    num_games = 1
     processes = []
 
     for _ in range(num_games):
