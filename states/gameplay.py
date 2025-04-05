@@ -186,7 +186,7 @@ class Gameplay(BaseState):
                 self.enemy_rockets.add(rocket)
                 self.all_sprites.add(rocket)
 
-    def draw(self, screen, arbitrary_number):
+    def draw(self, screen, _):
         self.starfield.render(screen)
         pressed_keys = pygame.key.get_pressed()
         for entity in self.all_sprites:
