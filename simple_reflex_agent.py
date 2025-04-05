@@ -52,20 +52,20 @@ class SimpleReflexAgent:
         if len(self.enemies):
             count = 0
             # pick the first enemy
-            # for enemy in self.enemies:
-            #     center = enemy.rect.x
-            #     break
+            for enemy in self.enemies:
+                center = enemy.rect.x
+                break
             # pick the last enemy
             # for enemy in self.enemies:
             #     if count == len(self.enemies) - 1:
             #         center = enemy.rect.x
             #     count += 1
             # pick a random enemy
-            random_int = random.randint(0, len(self.enemies) - 1)
-            for enemy in self.enemies:
-                if count == random_int:
-                    center = enemy.rect.x
-                count += 1
+            # random_int = random.randint(0, len(self.enemies) - 1)
+            # for enemy in self.enemies:
+            #     if count == random_int:
+            #         center = enemy.rect.x
+            #     count += 1
         if self.player.rect.x > center:
             self.player.update({K_LEFT: True, K_RIGHT: False})
         if self.player.rect.x < center:

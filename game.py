@@ -1,5 +1,6 @@
 import sys
 import pygame
+import time
 import constants
 
 
@@ -10,6 +11,8 @@ class Game(object):
         self.clock = pygame.time.Clock()
         self.fps = constants.FPS
         self.states = states
+        self.start_time = time.time()
+        self.death_time = time.time()
         self.state_name = start_state
         self.state = self.states[self.state_name]
         self.sethighscore = False
@@ -18,8 +21,9 @@ class Game(object):
     def event_loop(self):
         if self.state_name == "GAME_OVER" and not self.sethighscore:
             self.sethighscore = True
+            self.death_time = round(time.time() - self.start_time)
             with open("highscores.txt","a") as f:
-                f.write(str(self.states["GAMEPLAY"].score)+","+str(self.clock.get_time())+"\n")
+                f.write(str(self.states["GAMEPLAY"].score)+","+str(self.death_time)+"\n")
         
         for event in pygame.event.get():
             self.state.get_event(event)
@@ -38,10 +42,14 @@ class Game(object):
             self.flip_state()
         self.state.update(dt)
 
+    def final_metrics(self):
+        metrics = [self.states["GAMEPLAY"].score, self.death_time, self.states["GAMEPLAY"].score // 120]
+        return metrics
+
     def draw(self):
         self.screen.fill((0, 0, 0))
         print("draw", self.state_name)
-        self.state.draw(self.screen, self.states["GAMEPLAY"].score)
+        self.state.draw(self.screen, self.final_metrics())
 
     def run(self):
         while not self.done:

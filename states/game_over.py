@@ -28,8 +28,25 @@ class GameOver(BaseState):
             elif event.key == pygame.K_ESCAPE:
                 self.quit = True
 
-    def draw(self, surface, highscore):
+    def draw(self, surface, metrics):
         surface.fill(pygame.Color("black"))
-        # surface.blit(self.title, self.title_rect)
+
+        score_str = f'Score: {metrics[0]}'
+        score = self.font.render(score_str, True, pygame.Color("white"))
+        score_rectangle = score.get_rect(center=self.screen_rect.center)
+
+        ttd_str = f'TTD: {metrics[1]} Seconds'
+        ttd = self.font.render(ttd_str, True, pygame.Color("white"))
+        ttd_center = (score_rectangle.center[0], score_rectangle.center[1] + 50)
+        ttd_square = ttd.get_rect(
+            center=ttd_center)
         
-        surface.blit(self.font.render(str(highscore), True, pygame.Color("white")), self.title_rect)
+        enemies_str = f'Enemies Killed: {metrics[2]}'
+        enemies = self.font.render(enemies_str, True, pygame.Color("white"))
+        enemies_center = (ttd_square.center[0], ttd_square.center[1] + 50)
+        enemies_square = ttd.get_rect(
+            center=enemies_center)
+        
+        surface.blit(score, score_rectangle)
+        surface.blit(ttd, ttd_square)
+        surface.blit(enemies, enemies_square)
