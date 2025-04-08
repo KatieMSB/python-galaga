@@ -43,7 +43,11 @@ class Game(object):
         self.state.update(dt)
 
     def final_metrics(self):
-        metrics = [self.states["GAMEPLAY"].score, self.death_time, self.states["GAMEPLAY"].score // 120]
+        accuracy = 0
+        shots = self.states["GAMEPLAY"].total_rocket_shot
+        if shots > 0:
+            accuracy =  round(((self.states["GAMEPLAY"].score // 120) / self.states["GAMEPLAY"].total_rocket_shot) * 100)
+        metrics = [self.states["GAMEPLAY"].score, self.death_time, self.states["GAMEPLAY"].score // 120, shots, accuracy ]
         return metrics
 
     def draw(self):

@@ -30,6 +30,10 @@ class SimpleReflexAgent:
                 self.danger_up = abs(distance_x) < self.danger_zone // 2
                 return True
         return False
+    
+    def shoot(self, shoot_fn):
+        shoot_fn()
+
 
     def move_player(self):
         if self.danger_up:

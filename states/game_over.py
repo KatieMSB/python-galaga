@@ -44,9 +44,23 @@ class GameOver(BaseState):
         enemies_str = f'Enemies Killed: {metrics[2]}'
         enemies = self.font.render(enemies_str, True, pygame.Color("white"))
         enemies_center = (ttd_square.center[0], ttd_square.center[1] + 50)
-        enemies_square = ttd.get_rect(
+        enemies_square = enemies.get_rect(
             center=enemies_center)
+        
+        shots_str = f'Shots Shotted: {metrics[3]}'
+        shots = self.font.render(shots_str, True, pygame.Color("white"))
+        shots_center = (enemies_square.center[0], enemies_square.center[1] + 50)
+        shots_square = shots.get_rect(
+            center=shots_center)
+        
+        accuracy_str = f'Accuracy: {metrics[4]}%'
+        accuracy = self.font.render(accuracy_str, True, pygame.Color("white"))
+        accuracy_center = (shots_square.center[0], shots_square.center[1] + 50)
+        accuraacy_square = accuracy.get_rect(
+            center=accuracy_center)
         
         surface.blit(score, score_rectangle)
         surface.blit(ttd, ttd_square)
         surface.blit(enemies, enemies_square)
+        surface.blit(shots, shots_square)
+        surface.blit(accuracy, accuraacy_square)

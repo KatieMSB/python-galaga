@@ -70,6 +70,8 @@ class Gameplay(BaseState):
         self.show_control = False
         self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
+        self.is_dead = False
+        self.total_rocket_shot = 0
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
@@ -82,6 +84,7 @@ class Gameplay(BaseState):
         self.number_of_enemies = 10
         self.score = 0
         self.freeze = False
+        self.total_rocket_shot = 0
 
         self.all_enemies = pygame.sprite.Group()
         self.all_rockets = pygame.sprite.Group()
@@ -91,6 +94,7 @@ class Gameplay(BaseState):
         self.show_control = False
         self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
+        self.is_dead = False
 
     def add_control_points(self):
         for quartet_index in range(self.control_points1.number_of_quartets()):
@@ -102,8 +106,9 @@ class Gameplay(BaseState):
                     self.control_points1, self.mover))
 
     def get_event(self, event):
-        if len(self.all_rockets) < 2:
-            self.shoot_rocket()
+        if not (self.is_dead or len(self.all_rockets) == 2):
+            self.total_rocket_shot += 1
+            self.agent.shoot(shoot_fn=self.shoot_rocket)
 
         if (self.agent.check_boundary()):
             self.agent.move_player()
@@ -225,6 +230,7 @@ class Gameplay(BaseState):
             self.kill_sound.play()
             self.freeze = True
             self.player.kill()
+            self.is_dead = True
             if self.score > self.high_score:
                 self.high_score = self.score
 
