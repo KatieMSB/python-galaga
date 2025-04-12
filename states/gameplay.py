@@ -4,6 +4,11 @@ import spritesheet
 import constants
 from starfield import StarField
 
+from pygame.locals import (
+    K_LEFT,
+    K_RIGHT,
+)
+
 from simple_reflex_agent import SimpleReflexAgent
 from .base_state import BaseState
 from sprites.player import Player
@@ -119,6 +124,14 @@ class Gameplay(BaseState):
                 self.agent.move_player()
             else:
                 self.agent.reset_player()
+        else:
+            if event.type == pygame.KEYDOWN:
+                match event.key:
+                    case pygame.K_LEFT:
+                        self.player.update({K_LEFT: True, K_RIGHT: False})
+
+                    case pygame.K_RIGHT:
+                        self.player.update({K_LEFT: False, K_RIGHT: True})
         
         for entity in self.all_sprites:
             entity.get_event(event)
@@ -138,7 +151,7 @@ class Gameplay(BaseState):
         if event.type == FREEZE:
             if self.freeze:
                 self.done = True
-        elif event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.control_points1.save_control_points()
                 self.done = True

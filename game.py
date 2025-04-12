@@ -73,6 +73,7 @@ class Game(object):
             - Reward (int)
             - Done (bool)
         """
+        print(action)
         match action:
             case 1:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
