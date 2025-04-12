@@ -12,6 +12,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import torchvision.transforms as T
 
 
 env = GalagaEnv("human")
@@ -53,7 +54,7 @@ class ReplayMemory(object):
 class DQN(nn.Module):
     def __init__(self, n_channels, n_actions):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(n_channels, 32, kernel_size=8, stride=4)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=8, stride=4)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2)
         self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
         self.fc1 = nn.Linear(64 * 7 * 7, 512)
@@ -129,7 +130,6 @@ def select_action(state):
 
 episode_durations = []
 
-
 def plot_durations(show_result=False):
     plt.figure(1)
     durations_t = torch.tensor(episode_durations, dtype=torch.float)
@@ -200,8 +200,15 @@ else:
 
 for i_episode in range(num_episodes):
     # Initialize the environment and get its state
+
+    resize_transform = T.Compose([
+        T.ToPILImage(),
+        T.Resize((84, 84)),
+        T.ToTensor()
+    ])
+
     state, info = env.reset()
-    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+    state = resize_transform(state).unsqueeze(0).to(device)
     for t in count():
         action = select_action(state)
         observation, reward, terminated, truncated, _ = env.step(action.item())
@@ -211,7 +218,8 @@ for i_episode in range(num_episodes):
         if terminated:
             next_state = None
         else:
-            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+            observation = resize_transform(observation).unsqueeze(0).to(device)
+            next_state = torch.tensor(observation, dtype=torch.float32, device=device)
 
         # Store the transition in memory
         memory.push(state, action, next_state, reward)
