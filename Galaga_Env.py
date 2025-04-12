@@ -39,7 +39,7 @@ class GalagaEnv(gym.Env):
         self.clock = pygame.time.Clock()
 
         states = {
-            "GAMEPLAY": Gameplay(),
+            "GAMEPLAY": Gameplay(False),
             "GAME_OVER": GameOver()
         }
 
