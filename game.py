@@ -14,9 +14,18 @@ class Game(object):
         self.start_time = time.time()
         self.death_time = time.time()
         self.state_name = start_state
+        self.start_state = start_state
         self.state = self.states[self.state_name]
         self.sethighscore = False
 
+    def reset(self):
+        self.done = False
+        self.start_time = time.time()
+        self.death_time = time.time()
+        self.sethighscore = False
+        self.state_name = self.start_state
+        self.state = self.states[self.state_name]
+        self.state.startup()
 
     def event_loop(self):
         if self.state_name == "GAME_OVER" and not self.sethighscore:
@@ -26,7 +35,10 @@ class Game(object):
                 f.write(str(self.states["GAMEPLAY"].score)+","+str(self.death_time)+"\n")
         
         for event in pygame.event.get():
-            self.state.get_event(event)
+            if event.type == pygame.QUIT:
+                self.done = True
+            else:
+                self.state.get_event(event)
 
     def flip_state(self):
         next_state = self.state.next_state
@@ -52,14 +64,45 @@ class Game(object):
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        print("draw", self.state_name)
         self.state.draw(self.screen, self.final_metrics())
 
-    def run(self):
-        while not self.done:
-            dt = self.clock.tick(self.fps)
-            pygame.event.set_blocked(pygame.MOUSEMOTION)
-            self.event_loop()
-            self.update(dt)
-            self.draw()
-            pygame.display.update()
+    def step(self, action):
+        """
+        Run one step of the game.
+        Returns:
+            - Reward (int)
+            - Done (bool)
+        """
+        match action:
+            case 1:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
+
+            case 2:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+            
+            case 3:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+
+            case _:
+                None
+
+        dt = self.clock.tick(self.fps)
+
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        self.event_loop()
+        self.update(dt)
+        self.draw()
+        pygame.display.update()
+
+        reward = self.states["GAMEPLAY"].score
+        done = self.done or self.state_name == "GAME_OVER"
+        return reward, done
+
+    # def run(self):
+    #     while not self.done:
+    #         dt = self.clock.tick(self.fps)
+    #         pygame.event.set_blocked(pygame.MOUSEMOTION)
+    #         self.event_loop()
+    #         self.update(dt)
+    #         self.draw()
+    #         pygame.display.update()

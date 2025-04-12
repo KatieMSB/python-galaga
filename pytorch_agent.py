@@ -41,7 +41,7 @@ device = torch.device("cpu")
 
 
 
-env = gym.make("GalagaEnv")
+env = gym.make("Galaga-v0")
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 class ReplayMemory(object):

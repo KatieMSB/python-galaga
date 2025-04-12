@@ -1,71 +1,85 @@
 import numpy as np
+import pygame
 from typing import Optional
 import gymnasium as gym
+from gymnasium import spaces, register
+import constants
+from states.gameplay import Gameplay
+from states.game_over import GameOver
+from game import Game
+
+register (
+    id = 'Galaga-v0',
+    entry_point = 'Galaga_Env:GalagaEnv',
+)
 
 class GalagaEnv(gym.Env):
-    def __init__(self, size: int = 500):
-        # The size of the square grid
-        self.size = size
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 60}
+
+    def __init__(self, render_mode=None):
+        self.render_mode = render_mode
 
         # Define the agent and target location; randomly chosen in `reset` and updated in `step`
-        self._agent_location = np.array([-1, -1], dtype=np.int32)
-        self._target_location = np.array([-1, -1], dtype=np.int32)
+        self._agent_location = np.array([constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT - 40], dtype=np.int32)
 
         # Observations are dictionaries with the agent's and the target's location.
         # Each location is encoded as an element of {0, ..., `size`-1}^2
-        self.observation_space = gym.spaces.Dict({
-                "agent": gym.spaces.Box(0, size - 1, shape=(2,), dtype=int),
-                "target": gym.spaces.Box(0, size - 1, shape=(2,), dtype=int),
-        })
+        self.observation_space = spaces.Box(
+            low = np.array([0, 0], dtype = np.float32),
+            high = np.array([constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT], dtype = np.float32),
+            dtype = np.float32
+        )
 
         # We have 3 actions, corresponding to "right", "left", "shoot"
-        self.action_space = gym.spaces.Discrete(3)
-        # Dictionary maps the abstract actions to the directions on the grid
-        self._action_to_direction = {
-            0: np.array([1, 0]),   # Right
-            1: np.array([-1, 0]),  # Left
-            2: np.array([0, 1]),   # Shoot
-            3: np.array([0, -1])   # Nothing
+        self.action_space = gym.spaces.Discrete(4)
+
+    def _init_game(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+        self.clock = pygame.time.Clock()
+
+        states = {
+            "GAMEPLAY": Gameplay(),
+            "GAME_OVER": GameOver()
         }
 
-    def _get_obs(self):
-        return {"agent": self._agent_location, "target": self._target_location}
-    
-    def _get_info(self):
-        return {"distance": np.linalg.norm(self._agent_location - self._target_location, ord=1)}
-    
-    def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
-        # We need the following line to seed self.np_random
+        self.game = Game(self.screen, states, "GAMEPLAY")
+        self.game.reset()
+
+    def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+        self._init_game()
+        obs = self._get_obs()
+        return obs, {}
 
-        # Choose the agent's location uniformly at random
-        self._agent_location = self.np_random.integers(0, self.size, size=2, dtype=int)
-
-        # We will sample the target's location randomly until it does not coincide with the agent's location
-        self._target_location = self._agent_location
-        while np.array_equal(self._target_location, self._agent_location):
-            self._target_location = self.np_random.integers(
-                0, self.size, size=2, dtype=int
-            )
-
-        observation = self._get_obs()
-        info = self._get_info()
-
-        return observation, info
+    def _get_obs(self):
+        return pygame.surfarray.array3d(self.screen).swapaxes(0, 1)
     
     def step(self, action):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
-        direction = self._action_to_direction[action]
-        # We use `np.clip` to make sure we don't leave the grid bounds
-        self._agent_location = np.clip(
-            self._agent_location + direction, 0, self.size - 1
-        )
+        match action:
+            case 1:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
 
-        # An environment is completed if and only if the agent has reached the target
-        terminated = np.array_equal(self._agent_location, self._target_location)
-        truncated = False
-        reward = 1 if terminated else 0  # the agent is only reached at the end of the episode
-        observation = self._get_obs()
-        info = self._get_info()
+            case 2:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+            
+            case 3:
+                pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
 
-        return observation, reward, terminated, truncated, info
+            case _:
+                None
+
+        reward, done = self.game.step()
+        obs = self._get_obs()
+
+        return obs, reward, done, False, {}
+    
+    def render(self):
+        if self.render_mode == "human":
+            pygame.display.flip()
+        elif self.render_mode == "rgb_array":
+            return self._get_obs()
+        
+    def close(self):
+        pygame.quit()
