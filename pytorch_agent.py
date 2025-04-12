@@ -4,12 +4,17 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 import gymnasium as gym
+import matplotlib as plt
 import pygame
 import random
 import math
 from collections import namedtuple, deque
 from pygame.locals import (K_LEFT, K_RIGHT)
 from Galaga_Env import GalagaEnv
+
+is_ipython = 'inline' in plt.get_backend()
+if is_ipython:
+    from IPython import display
 
 class PytorchAgent:
     def __init__(self, player, rockets, enemies, danger_zone=150):

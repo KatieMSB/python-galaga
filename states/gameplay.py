@@ -29,7 +29,7 @@ def read_scores():
     integer_list.sort(reverse=True)
     return integer_list
 class Gameplay(BaseState):
-    def __init__(self):
+    def __init__(self, use_simple):
         super(Gameplay, self).__init__()
         pygame.time.set_timer(ADDENEMY, 450)
         pygame.time.set_timer(ENEMYSHOOTS, 1000)
@@ -68,7 +68,9 @@ class Gameplay(BaseState):
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
-        self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
+        self.use_simple = use_simple
+        if use_simple:
+            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
         self.is_dead = False
         self.total_rocket_shot = 0
@@ -92,7 +94,9 @@ class Gameplay(BaseState):
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
-        self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
+        self.use_simple = False
+        if self.use_simple:
+            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
         self.is_dead = False
 
@@ -106,14 +110,15 @@ class Gameplay(BaseState):
                     self.control_points1, self.mover))
 
     def get_event(self, event):
-        if not (self.is_dead or len(self.all_rockets) == 2):
-            self.total_rocket_shot += 1
-            self.agent.shoot(shoot_fn=self.shoot_rocket)
+        if self.use_simple:
+            if not (self.is_dead or len(self.all_rockets) == 2):
+                self.total_rocket_shot += 1
+                self.agent.shoot(shoot_fn=self.shoot_rocket)
 
-        if (self.agent.check_boundary()):
-            self.agent.move_player()
-        else:
-            self.agent.reset_player()
+            if (self.agent.check_boundary()):
+                self.agent.move_player()
+            else:
+                self.agent.reset_player()
         
         for entity in self.all_sprites:
             entity.get_event(event)

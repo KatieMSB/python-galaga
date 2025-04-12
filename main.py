@@ -15,7 +15,7 @@ def run_game():
 
     screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
     states = {
-        "GAMEPLAY": Gameplay(),
+        "GAMEPLAY": Gameplay(True),
         "GAME_OVER": GameOver(),
     }
 
