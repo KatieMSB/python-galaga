@@ -54,7 +54,10 @@ class Gameplay(BaseState):
         self.mover = ControlHandlerMover(self.control_points1, self.path_point_selector)
         self.control_sprites = pygame.sprite.Group()
         self.add_control_points()
-        self.player = Player(self.sprites)
+        self.use_simple = use_simple
+        if use_simple:
+            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
+        self.player = Player(self.sprites, self.use_simple)
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
         self.wave_count = 0
@@ -73,9 +76,6 @@ class Gameplay(BaseState):
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
-        self.use_simple = use_simple
-        if use_simple:
-            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
         self.is_dead = False
         self.total_rocket_shot = 0
@@ -83,7 +83,10 @@ class Gameplay(BaseState):
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
         pygame.mixer.music.play()
-        self.player = Player(self.sprites)
+        self.use_simple = False
+        if self.use_simple:
+            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
+        self.player = Player(self.sprites, self.use_simple)
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
         self.wave_count = 0
@@ -99,9 +102,6 @@ class Gameplay(BaseState):
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
-        self.use_simple = False
-        if self.use_simple:
-            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.mover.align_all()
         self.is_dead = False
 

@@ -8,7 +8,7 @@ import constants
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, sprites):
+    def __init__(self, sprites, use_simple):
         super(Player, self).__init__()
         self.timer = 0
         self.interval = 2
@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.surf = self.images[0]
         self.rect = self.surf.get_rect(center=(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT - 40))
         self.image_index = 0
+        self.use_simple = use_simple
 
     def get_event(self, event):
         pass
@@ -25,9 +26,15 @@ class Player(pygame.sprite.Sprite):
         self.timer += 1
 
         if pressed_keys[K_LEFT]:
-            self.rect.move_ip(-50, 0)
+            if self.use_simple:
+                self.rect.move_ip(-50, 0)
+            else:
+                self.rect.move_ip(-5, 0)
         if pressed_keys[K_RIGHT]:
-            self.rect.move_ip(50, 0)
+            if self.use_simple:
+                self.rect.move_ip(50, 0)
+            else:
+                self.rect.move_ip(5, 0)
 
         if self.rect.left < 0:
             self.rect.left = 0
