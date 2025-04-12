@@ -94,7 +94,7 @@ class Game(object):
         self.draw()
         pygame.display.update()
 
-        reward = self.states["GAMEPLAY"].reward
+        reward = self.states["GAMEPLAY"].score
         done = self.done or self.state_name == "GAME_OVER"
         return reward, done
 
