@@ -70,7 +70,7 @@ class GalagaEnv(gym.Env):
             case _:
                 None
 
-        reward, done = self.game.step()
+        reward, done = self.game.step(action)
         obs = self._get_obs()
 
         return obs, reward, done, False, {}
