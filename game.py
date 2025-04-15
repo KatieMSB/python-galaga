@@ -75,8 +75,12 @@ class Game(object):
         # Calculate points earned for killing an enemy
         enemy_points = self.states["GAMEPLAY"].score // 120
 
+        # Calculate time points
+        time_points = pow(2, 0.01 * time_elapsed) - 1
+        # time_points = math.sqrt(0.01 * time_elapsed)
+
         # Calculate rewards
-        reward = round(enemy_points + math.sqrt(0.01 * time_elapsed))
+        reward = round(enemy_points + time_points)
 
         return reward
 
