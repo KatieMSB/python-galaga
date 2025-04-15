@@ -8,11 +8,6 @@ from states.gameplay import Gameplay
 from states.game_over import GameOver
 from game import Game
 
-register (
-    id = 'Galaga-v0',
-    entry_point = 'Galaga_Env:GalagaEnv',
-)
-
 class GalagaEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 60}
 
@@ -50,10 +45,12 @@ class GalagaEnv(gym.Env):
         super().reset(seed=seed)
         self._init_game()
         obs = self._get_obs()
-        return obs, {}
+        info = {}
+        return obs, info
 
     def _get_obs(self):
-        return pygame.surfarray.array3d(self.screen).swapaxes(0, 1)
+        # return pygame.surfarray.array3d(self.screen).swapaxes(0, 1)
+        return self.game.get_obs()
     
     def step(self, action):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
@@ -72,8 +69,10 @@ class GalagaEnv(gym.Env):
 
         reward, done = self.game.step(action)
         obs = self._get_obs()
+        truncated = False
+        info = {}
 
-        return obs, reward, done, False, {}
+        return obs, reward, done, truncated, info
     
     def render(self):
         if self.render_mode == "human":
@@ -83,3 +82,8 @@ class GalagaEnv(gym.Env):
         
     def close(self):
         pygame.quit()
+
+register (
+    id = 'Galaga-v0',
+    entry_point = GalagaEnv,
+)

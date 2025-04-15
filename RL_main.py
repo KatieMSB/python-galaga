@@ -1,6 +1,7 @@
 from Galaga_Env import GalagaEnv
 
 import gymnasium as gym
+from gymnasium.wrappers import RecordEpisodeStatistics, RecordVideo
 import math
 import random
 import matplotlib
@@ -14,8 +15,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
 
-
-env = GalagaEnv("human")
+render_mode = "human"
+env = gym.make("Galaga-v0", render_mode=render_mode)
 
 
 # set up matplotlib
@@ -32,6 +33,10 @@ device = torch.device(
     "cpu"
 )
 
+if render_mode == "rgb_array":
+    recording_interval = 100 # Record a video every 100 episodes
+    env = RecordVideo(env, video_folder="Videos", name_prefix="training", episode_trigger=lambda x: x % recording_interval == 0)
+    env = RecordEpisodeStatistics(env)
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
@@ -52,13 +57,17 @@ class ReplayMemory(object):
 
 
 class DQN(nn.Module):
-    def __init__(self, n_channels, n_actions):
+    def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=8, stride=4)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2)
-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
-        self.fc1 = nn.Linear(64 * 7 * 7, 512)
-        self.fc2 = nn.Linear(512, n_actions)
+        self.layer1 = nn.Linear(n_observations, 128)
+        self.layer2 = nn.Linear(128, 128)
+        self.layer3 = nn.Linear(128, n_actions)
+
+        # self.conv1 = nn.Conv2d(3, 32, kernel_size=8, stride=4)
+        # self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2)
+        # self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
+        # self.fc1 = nn.Linear(64 * 7 * 7, 512)
+        # self.fc2 = nn.Linear(512, n_actions)
 
         # self.layer1 = nn.Linear(n_observations, 128)
         # self.layer2 = nn.Linear(128, 128)
@@ -67,12 +76,16 @@ class DQN(nn.Module):
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = x.view(x.size(0), -1)
-        x = F.relu(self.fc1(x))
-        return self.fc2(x)
+        x = F.relu(self.layer1(x))
+        x = F.relu(self.layer2(x))
+        return self.layer3(x)
+
+        # x = F.relu(self.conv1(x))
+        # x = F.relu(self.conv2(x))
+        # x = F.relu(self.conv3(x))
+        # x = x.view(x.size(0), -1)
+        # x = F.relu(self.fc1(x))
+        # return self.fc2(x)
 
         # x = F.relu(self.layer1(x))
         # x = F.relu(self.layer2(x))
@@ -216,7 +229,8 @@ for i_episode in range(num_episodes):
     ])
 
     state, info = env.reset()
-    state = resize_transform(state).unsqueeze(0).to(device)
+    # state = resize_transform(state).unsqueeze(0).to(device)
+    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
         observation, reward, terminated, truncated, _ = env.step(action.item())
@@ -226,8 +240,9 @@ for i_episode in range(num_episodes):
         if terminated:
             next_state = None
         else:
-            observation = resize_transform(observation).unsqueeze(0).to(device)
-            next_state = torch.tensor(observation, dtype=torch.float32, device=device)
+            # observation = resize_transform(observation).unsqueeze(0).to(device)
+            # next_state = torch.tensor(observation, dtype=torch.float32, device=device)
+            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
         # Store the transition in memory
         memory.push(state, action, next_state, reward)
