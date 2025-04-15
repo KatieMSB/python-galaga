@@ -2,6 +2,7 @@ import sys
 import pygame
 import time
 import constants
+import math
 
 
 class Game(object):
@@ -57,14 +58,27 @@ class Game(object):
     def final_metrics(self):
         accuracy = 0
         shots = self.states["GAMEPLAY"].total_rocket_shot
+        ttd = round(time.time() - self.start_time)
         if shots > 0:
             accuracy =  round(((self.states["GAMEPLAY"].score // 120) / self.states["GAMEPLAY"].total_rocket_shot) * 100)
-        metrics = [self.states["GAMEPLAY"].score, self.death_time, self.states["GAMEPLAY"].score // 120, shots, accuracy ]
+        metrics = [self.states["GAMEPLAY"].score, ttd, self.states["GAMEPLAY"].score // 120, shots, accuracy ]
         return metrics
 
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.state.draw(self.screen, self.final_metrics())
+
+    def _get_reward(self):
+        # Get total time alive
+        time_elapsed = round(time.time() - self.start_time)
+
+        # Calculate points earned for killing an enemy
+        enemy_points = self.states["GAMEPLAY"].score // 120
+
+        # Calculate rewards
+        reward = round(enemy_points + math.sqrt(0.01 * time_elapsed))
+
+        return reward
 
     def step(self, action):
         """
@@ -73,7 +87,6 @@ class Game(object):
             - Reward (int)
             - Done (bool)
         """
-        print(action)
         match action:
             case 1:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
@@ -94,9 +107,12 @@ class Game(object):
         self.update(dt)
         self.draw()
         pygame.display.update()
-
-        reward = self.states["GAMEPLAY"].score
+        
+        reward = self._get_reward()
         done = self.done or self.state_name == "GAME_OVER"
+
+        print(f"Action: {action} Reward: {reward}")
+
         return reward, done
 
     # def run(self):
