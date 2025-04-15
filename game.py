@@ -76,7 +76,7 @@ class Game(object):
         enemy_points = self.states["GAMEPLAY"].score // 120
 
         # Calculate time points
-        time_points = pow(2, 0.01 * time_elapsed) - 1
+        time_points = pow(10, 0.01 * time_elapsed) - 1
         # time_points = math.sqrt(0.01 * time_elapsed)
 
         # Calculate rewards
