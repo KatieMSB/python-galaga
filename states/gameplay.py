@@ -158,7 +158,7 @@ class Gameplay(BaseState):
             if event.key == pygame.K_s:
                 self.show_control = not self.show_control
             if event.key == pygame.K_SPACE:
-                if len(self.all_rockets) < 2:
+                if len(self.all_rockets) < 2 and not self.is_dead:
                     self.total_rocket_shot += 1
                     self.shoot_rocket()
 
