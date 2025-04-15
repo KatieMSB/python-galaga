@@ -159,6 +159,7 @@ class Gameplay(BaseState):
                 self.show_control = not self.show_control
             if event.key == pygame.K_SPACE:
                 if len(self.all_rockets) < 2:
+                    self.total_rocket_shot += 1
                     self.shoot_rocket()
 
     def add_enemy(self):
