@@ -79,6 +79,7 @@ class Gameplay(BaseState):
         self.mover.align_all()
         self.is_dead = False
         self.total_rocket_shot = 0
+        self.rockets_avoided = 0
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
@@ -104,6 +105,7 @@ class Gameplay(BaseState):
         self.show_control = False
         self.mover.align_all()
         self.is_dead = False
+        self.rockets_avoided = 0
 
     def add_control_points(self):
         for quartet_index in range(self.control_points1.number_of_quartets()):
@@ -161,6 +163,11 @@ class Gameplay(BaseState):
                 if len(self.all_rockets) < 2 and not self.is_dead:
                     self.total_rocket_shot += 1
                     self.shoot_rocket()
+
+        # Get the number of rockets avoided
+        for i, rocket in enumerate(self.enemy_rockets):
+            if rocket.rect.top >= constants.SCREEN_HEIGHT:
+                self.rockets_avoided += 1
 
     def add_enemy(self):
         self.enemies += 1

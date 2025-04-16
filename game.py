@@ -72,27 +72,24 @@ class Game(object):
     def _get_reward(self):
         enemies_killed = self.states["GAMEPLAY"].score // 120
         shots_fired = self.states["GAMEPLAY"].total_rocket_shot
+        rockets_avoided = self.states["GAMEPLAY"].rockets_avoided
+
+        print(f"Rockets Avoided: {rockets_avoided}")
 
         # Get total time alive
         time_elapsed = round(time.time() - self.start_time)
 
-        # Calculate Shooting Points
-        shooting_points = shots_fired
+        # Calculate Rocket Points
+        rocket_points = shots_fired + rockets_avoided
 
         # Calculate points earned for killing an enemy
         enemy_points = enemies_killed * 10
-
-        # # Calculate Accurracy Points
-        # if shooting_points > 0:
-        #     accuracy_points = round((enemies_killed / shots_fired) * 100)
-        # else:
-        #     accuracy_points = 0
 
         # Calculate time points
         time_points = math.floor(pow(10, 0.05 * time_elapsed)) - 1
 
         # Calculate rewards
-        reward = shooting_points + enemy_points + time_points
+        reward = rocket_points + enemy_points + time_points
 
         return reward
 
