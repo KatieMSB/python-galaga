@@ -176,7 +176,7 @@ def plot_durations(show_result=False):
         ax[1].clear()
         ax[1].set_title('Training...')
     ax[1].set_xlabel('Episode')
-    ax[1].set_ylabel('Reward Score')
+    ax[1].set_ylabel('Rewards')
     ax[1].plot(rewards_t.numpy())
     # Take 100 episode averages and plot them too
     if len(rewards_t) >= 100:
