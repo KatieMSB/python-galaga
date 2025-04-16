@@ -2,6 +2,7 @@ import pygame
 import random
 import spritesheet
 import constants
+import time
 from starfield import StarField
 
 from pygame.locals import (
@@ -80,6 +81,7 @@ class Gameplay(BaseState):
         self.is_dead = False
         self.total_rocket_shot = 0
         self.rockets_avoided = 0
+        self.start_time = time.time()
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
@@ -290,3 +292,8 @@ class Gameplay(BaseState):
         screen.blit(score, (constants.SCREEN_WIDTH / 2 - score.get_rect().width / 2, 10))
         score = self.font.render(str(self.high_score), True, (255, 255, 255))
         screen.blit(score, (constants.SCREEN_WIDTH / 2 - score.get_rect().width / 2, 40))
+
+        time_display = self.font.render('TIME', True, (255, 20, 20))
+        screen.blit(time_display, (constants.SCREEN_WIDTH / 2 + 300 - time_display.get_rect().width / 2, 10))
+        time_display = self.font.render(str(round(time.time() - self.start_time)), True, (255, 255, 255))
+        screen.blit(time_display, (constants.SCREEN_WIDTH / 2 + 300 - time_display.get_rect().width / 2, 40))

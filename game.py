@@ -73,10 +73,6 @@ class Game(object):
         enemies_killed = self.states["GAMEPLAY"].score // 120
         shots_fired = self.states["GAMEPLAY"].total_rocket_shot
         rockets_avoided = self.states["GAMEPLAY"].rockets_avoided
-
-        print(f"Rockets Avoided: {rockets_avoided}")
-
-        # Get total time alive
         time_elapsed = round(time.time() - self.start_time)
 
         # Calculate Rocket Points
