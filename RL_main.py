@@ -143,12 +143,13 @@ def select_action(state):
 
 episode_durations = []
 episode_rewards = []
+episode_scores = []
 
 def plot_durations(show_result=False):
     fig = plt.figure(1)
     fig.clf()
-    ax = fig.subplots(2, 1)
-    fig.subplots_adjust(hspace=0.5)
+    ax = fig.subplots(3, 1)
+    fig.subplots_adjust(hspace=1)
     fig.suptitle("Training Data")
 
     # Subplot 1
@@ -182,6 +183,22 @@ def plot_durations(show_result=False):
         means = rewards_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
         ax[1].plot(means.numpy())
+
+    # Subplot 3
+    scores_t = torch.tensor(episode_scores, dtype=torch.float)
+    if show_result:
+        ax[2].set_title('Result')
+    else:
+        ax[2].clear()
+        ax[2].set_title('Training...')
+    ax[2].set_xlabel('Episode')
+    ax[2].set_ylabel('Scores')
+    ax[2].plot(scores_t.numpy())
+    # Take 100 episode averages and plot them too
+    if len(scores_t) >= 100:
+        means = scores_t.unfold(0, 100, 1).mean(1).view(-1)
+        means = torch.cat((torch.zeros(99), means))
+        ax[2].plot(means.numpy())
 
     plt.pause(0.001)  # pause a bit so that plots are updated
     if is_ipython:
@@ -248,7 +265,7 @@ for i_episode in range(num_episodes):
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
-        observation, reward, terminated, truncated, _ = env.step(action.item())
+        observation, reward, terminated, truncated, step_info = env.step(action.item())
         reward = torch.tensor([reward], device=device)
         done = terminated or truncated
 
@@ -279,6 +296,7 @@ for i_episode in range(num_episodes):
         if done:
             episode_durations.append(t + 1)
             episode_rewards.append(reward)
+            episode_scores.append(step_info["Score"])
             plot_durations()
             break
 

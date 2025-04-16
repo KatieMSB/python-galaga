@@ -89,6 +89,9 @@ class Game(object):
 
         return reward
 
+    def get_info(self):
+        return {"Score": self.states["GAMEPLAY"].score}
+
     def get_obs(self):
         # Convert data into a numpy array
         score = self.states["GAMEPLAY"].score
