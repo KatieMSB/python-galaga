@@ -87,24 +87,28 @@ class Game(object):
 
     def get_obs(self):
         # Convert data into a numpy array
-        pos_player = np.array([self.states["GAMEPLAY"].player.rect.centerx, self.states["GAMEPLAY"].player.rect.centery])
-        pos_shots = np.full((2, 2), -1)
-        pos_enemies = np.full((26, 2), -1)
-        pos_rockets = np.full((26, 2), -1)
+        player_data = np.array([self.states["GAMEPLAY"].player.rect.centerx, self.states["GAMEPLAY"].player.rect.centery])
+        shots_data = np.full((2, 4), -1)
+        enemies_data = np.full((26, 2), -1)
+        rockets_data = np.full((26, 4), -1)
 
         for i, shot in enumerate(self.states["GAMEPLAY"].all_rockets):
-            pos_shots[i][0] = shot.rect.centerx
-            pos_shots[i][1] = shot.rect.centery
+            shots_data[i][0] = shot.rect.centerx
+            shots_data[i][1] = shot.rect.centery
+            shots_data[i][2] = shot.xSpeed
+            shots_data[i][3] = shot.ySpeed
 
         for i, enemy in enumerate(self.states["GAMEPLAY"].all_enemies):
-            pos_enemies[i][0] = enemy.rect.centerx
-            pos_enemies[i][1] = enemy.rect.centery
+            enemies_data[i][0] = enemy.rect.centerx
+            enemies_data[i][1] = enemy.rect.centery
 
         for i, rocket in enumerate(self.states["GAMEPLAY"].enemy_rockets):
-            pos_rockets[i][0] = rocket.rect.centerx
-            pos_rockets[i][1] = rocket.rect.centery
+            rockets_data[i][0] = rocket.rect.centerx
+            rockets_data[i][1] = rocket.rect.centery
+            rockets_data[i][2] = rocket.xSpeed
+            rockets_data[i][3] = rocket.ySpeed
         
-        observations = np.concatenate(([pos_player], pos_shots, pos_enemies, pos_rockets)).flatten()
+        observations = np.concatenate(([player_data], shots_data, enemies_data, rockets_data)).flatten()
 
         print(f"Observations: {observations}")
 
