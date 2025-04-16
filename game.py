@@ -110,7 +110,7 @@ class Game(object):
         
         observations = np.append([player_data], np.append(shots_data, np.append(enemies_data, rockets_data))).flatten()
 
-        print(f"Observations: {observations}")
+        # print(f"Observations: {observations}")
 
         return observations
 
