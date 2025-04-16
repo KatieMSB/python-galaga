@@ -145,28 +145,43 @@ episode_durations = []
 episode_rewards = []
 
 def plot_durations(show_result=False):
-    plt.figure(1)
+    fig = plt.figure(1)
+    fig.clf()
+    ax = fig.subplots(2, 1)
+    fig.subplots_adjust(hspace=0.5)
+    fig.suptitle("Training Data")
+
+    # Subplot 1
     durations_t = torch.tensor(episode_durations, dtype=torch.float)
+    if show_result:
+        ax[0].set_title('Result')
+    else:
+        ax[0].clear()
+        ax[0].set_title('Training...')
+    ax[0].set_xlabel('Episode')
+    ax[0].set_ylabel('Duration')
+    ax[0].plot(durations_t.numpy())
+    # Take 100 episode averages and plot them too
+    if len(durations_t) >= 100:
+        means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
+        means = torch.cat((torch.zeros(99), means))
+        ax[0].plot(means.numpy())
+
+    # Subplot 2
     rewards_t = torch.tensor(episode_rewards, dtype=torch.float)
     if show_result:
-        plt.title('Result')
+        ax[1].set_title('Result')
     else:
-        plt.clf()
-        plt.title('Training...')
-    plt.xlabel('Episode')
-    # plt.ylabel('Duration')
-    # plt.plot(durations_t.numpy())
-    plt.ylabel('Reward Score')
-    plt.plot(rewards_t.numpy())
+        ax[1].clear()
+        ax[1].set_title('Training...')
+    ax[1].set_xlabel('Episode')
+    ax[1].set_ylabel('Reward Score')
+    ax[1].plot(rewards_t.numpy())
     # Take 100 episode averages and plot them too
-    # if len(durations_t) >= 100:
-    #     means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
-    #     means = torch.cat((torch.zeros(99), means))
-    #     plt.plot(means.numpy())
     if len(rewards_t) >= 100:
         means = rewards_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
-        plt.plot(means.numpy())
+        ax[1].plot(means.numpy())
 
     plt.pause(0.001)  # pause a bit so that plots are updated
     if is_ipython:
@@ -222,11 +237,11 @@ else:
 for i_episode in range(num_episodes):
     # Initialize the environment and get its state
 
-    resize_transform = T.Compose([
-        T.ToPILImage(),
-        T.Resize((84, 84)),
-        T.ToTensor()
-    ])
+    # resize_transform = T.Compose([
+    #     T.ToPILImage(),
+    #     T.Resize((84, 84)),
+    #     T.ToTensor()
+    # ])
 
     state, info = env.reset()
     # state = resize_transform(state).unsqueeze(0).to(device)
