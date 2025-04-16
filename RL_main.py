@@ -148,6 +148,7 @@ episode_scores = []
 def plot_durations(show_result=False):
     fig = plt.figure(1)
     fig.clf()
+    fig.set_figheight(8)
     ax = fig.subplots(3, 1)
     fig.subplots_adjust(hspace=1)
     fig.suptitle("Training Data")
