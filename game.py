@@ -88,21 +88,16 @@ class Game(object):
     def get_obs(self):
         # Convert data into a numpy array
         pos_player = np.array([self.states["GAMEPLAY"].player.rect.centerx, self.states["GAMEPLAY"].player.rect.centery])
-        pos_enemies = np.full((13, 2), -1)
-        pos_rockets = np.full((13, 2), -1)
-
-        print(len(self.states["GAMEPLAY"].all_enemies))
+        pos_enemies = np.full((26, 2), -1)
+        pos_rockets = np.full((26, 2), -1)
 
         for i, enemy in enumerate(self.states["GAMEPLAY"].all_enemies):
-            print(self.states["GAMEPLAY"].enemies)
             pos_enemies[i][0] = enemy.rect.centerx
             pos_enemies[i][1] = enemy.rect.centery
 
         for i, rocket in enumerate(self.states["GAMEPLAY"].enemy_rockets):
             pos_rockets[i][0] = rocket.rect.centerx
             pos_rockets[i][1] = rocket.rect.centery
-
-        print(np.concatenate(([pos_player], pos_enemies, pos_rockets)).flatten())
         
         return np.concatenate(([pos_player], pos_enemies, pos_rockets)).flatten()
 
