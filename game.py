@@ -108,7 +108,7 @@ class Game(object):
             rockets_data[i][2] = rocket.xSpeed
             rockets_data[i][3] = rocket.ySpeed
         
-        observations = np.concatenate(([player_data], shots_data, enemies_data, rockets_data)).flatten()
+        observations = np.append([player_data], np.append(shots_data, np.append(enemies_data, rockets_data))).flatten()
 
         print(f"Observations: {observations}")
 
