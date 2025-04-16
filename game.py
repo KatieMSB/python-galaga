@@ -70,23 +70,36 @@ class Game(object):
         self.state.draw(self.screen, self.final_metrics())
 
     def _get_reward(self):
+        enemies_killed = self.states["GAMEPLAY"].score // 120
+        shots_fired = self.states["GAMEPLAY"].total_rocket_shot
+
         # Get total time alive
         time_elapsed = round(time.time() - self.start_time)
 
+        # Calculate Shooting Points
+        shooting_points = shots_fired
+
         # Calculate points earned for killing an enemy
-        enemy_points = self.states["GAMEPLAY"].score // 120
+        enemy_points = enemies_killed * 10
+
+        # # Calculate Accurracy Points
+        # if shooting_points > 0:
+        #     accuracy_points = round((enemies_killed / shots_fired) * 100)
+        # else:
+        #     accuracy_points = 0
 
         # Calculate time points
-        time_points = math.floor(pow(10, 0.01 * time_elapsed)) - 1
-        # time_points = math.sqrt(0.01 * time_elapsed)
+        time_points = math.floor(pow(10, 0.05 * time_elapsed)) - 1
 
         # Calculate rewards
-        reward = enemy_points + time_points
+        reward = shooting_points + enemy_points + time_points
 
         return reward
 
     def get_obs(self):
         # Convert data into a numpy array
+        score = self.states["GAMEPLAY"].score
+        time_elapsed = round(time.time() - self.start_time)
         player_data = np.array([self.states["GAMEPLAY"].player.rect.centerx, self.states["GAMEPLAY"].player.rect.centery])
         shots_data = np.full((2, 4), -1)
         enemies_data = np.full((26, 2), -1)
@@ -108,7 +121,7 @@ class Game(object):
             rockets_data[i][2] = rocket.xSpeed
             rockets_data[i][3] = rocket.ySpeed
         
-        observations = np.append([player_data], np.append(shots_data, np.append(enemies_data, rockets_data))).flatten()
+        observations = np.append([score], np.append([time_elapsed], np.append([player_data], np.append(shots_data, np.append(enemies_data, rockets_data))))).flatten()
 
         # print(f"Observations: {observations}")
 
