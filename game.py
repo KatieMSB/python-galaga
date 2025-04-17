@@ -19,6 +19,8 @@ class Game(object):
         self.start_state = start_state
         self.state = self.states[self.state_name]
         self.sethighscore = False
+        self.near_misses = 0
+        self.player = self.states["GAMEPLAY"].player
 
     def reset(self):
         self.done = False
@@ -27,6 +29,7 @@ class Game(object):
         self.sethighscore = False
         self.state_name = self.start_state
         self.state = self.states[self.state_name]
+        self.near_misses = 0
         self.state.startup()
 
     def event_loop(self):
@@ -69,10 +72,28 @@ class Game(object):
         self.screen.fill((0, 0, 0))
         self.state.draw(self.screen, self.final_metrics())
 
+    def _get_near_misses(self):
+        danger_zone = 50
+
+        for i, rocket in enumerate(self.states["GAMEPLAY"].enemy_rockets):
+            if abs(self.player.rect.centerx - rocket.rect.centerx) <= danger_zone and abs(self.player.rect.centery - rocket.rect.centery) <= danger_zone:
+                self.near_misses += 1
+
+        return self.near_misses
+    
+    def _is_on_target(self):
+        target_zone = 50
+
+        for i, enemy in enumerate(self.states["GAMEPLAY"].all_enemies):
+            if abs(self.player.rect.centerx - enemy.rect.centerx) <= target_zone:
+                return True
+        
+        return False
+
     def _get_reward(self):
         enemies_killed = self.states["GAMEPLAY"].score // 120
-        shots_fired = self.states["GAMEPLAY"].total_rocket_shot
-        rockets_avoided = self.states["GAMEPLAY"].rockets_avoided
+        shots_fired = self.states["GAMEPLAY"].total_rocket_shot * 5
+        rockets_avoided = self.states["GAMEPLAY"].rockets_avoided * 5
         time_elapsed = round(time.time() - self.start_time)
 
         # Calculate Rocket Points
@@ -82,14 +103,21 @@ class Game(object):
         enemy_points = enemies_killed * 10
 
         # Calculate time points
-        time_points = math.floor(pow(10, 0.05 * time_elapsed)) - 1
+        time_points = time_elapsed * 3 #math.floor(pow(10, 0.1 * time_elapsed)) - 1
+
+        # Calculate near misses
+        near_miss_points = self._get_near_misses() * 5
 
         # Calculate rewards
-        reward = rocket_points + enemy_points + time_points
+        reward = rocket_points + enemy_points + time_points - near_miss_points
 
-        # Lose points for dying
-        if self.state_name == "GAME_OVER":
-            reward = reward // 2
+        # Penalty for staying in the same place too long
+        if self.player.last_pos[0] == self.player.rect.centerx:
+            reward -= 2
+
+        # Reward for aiming at enemies
+        if self._is_on_target():
+            reward += 5
 
         return reward
 
@@ -100,7 +128,7 @@ class Game(object):
         # Convert data into a numpy array
         score = self.states["GAMEPLAY"].score
         time_elapsed = round(time.time() - self.start_time)
-        player_data = np.array([self.states["GAMEPLAY"].player.rect.centerx, self.states["GAMEPLAY"].player.rect.centery])
+        player_data = np.array([self.player.rect.centerx, self.player.rect.centery])
         shots_data = np.full((2, 4), -1)
         enemies_data = np.full((26, 2), -1)
         rockets_data = np.full((26, 4), -1)

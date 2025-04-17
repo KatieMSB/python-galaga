@@ -18,12 +18,14 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center=(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT - 40))
         self.image_index = 0
         self.use_simple = use_simple
+        self.last_pos = (self.rect.centerx, self.rect.centery)
 
     def get_event(self, event):
         pass
 
     def update(self, pressed_keys):
         self.timer += 1
+        self.last_pos = (self.rect.centerx, self.rect.centery)
 
         if pressed_keys[K_LEFT]:
             if self.use_simple:
