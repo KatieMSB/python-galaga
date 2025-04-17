@@ -89,7 +89,7 @@ class Game(object):
 
         # Lose points for dying
         if self.state_name == "GAME_OVER":
-            reward -= 50
+            reward = reward // 2
 
         return reward
 
