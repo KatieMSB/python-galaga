@@ -87,6 +87,10 @@ class Game(object):
         # Calculate rewards
         reward = rocket_points + enemy_points + time_points
 
+        # Lose points for dying
+        if self.state_name == "GAME_OVER":
+            reward -= 50
+
         return reward
 
     def get_info(self):
