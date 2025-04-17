@@ -106,7 +106,7 @@ class Game(object):
         time_points = time_elapsed * 3 #math.floor(pow(10, 0.1 * time_elapsed)) - 1
 
         # Calculate near misses
-        near_miss_points = self._get_near_misses() * 5
+        near_miss_points = self._get_near_misses() * 6
 
         # Calculate rewards
         reward = rocket_points + enemy_points + time_points - near_miss_points
@@ -117,7 +117,7 @@ class Game(object):
 
         # Reward for aiming at enemies
         if self._is_on_target():
-            reward += 5
+            reward += 20
 
         return reward
 
