@@ -112,8 +112,6 @@ n_actions = env.action_space.n
 state, info = env.reset()
 n_observations = len(state)
 
-print(n_observations, n_actions)
-
 policy_net = DQN(n_observations, n_actions).to(device)
 target_net = DQN(n_observations, n_actions).to(device)
 target_net.load_state_dict(policy_net.state_dict())
