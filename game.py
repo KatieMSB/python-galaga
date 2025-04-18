@@ -73,7 +73,7 @@ class Game(object):
         self.state.draw(self.screen, self.final_metrics())
 
     def _get_near_misses(self):
-        danger_zone = 50
+        danger_zone = 100
 
         for i, rocket in enumerate(self.states["GAMEPLAY"].enemy_rockets):
             if abs(self.player.rect.centerx - rocket.rect.centerx) <= danger_zone and abs(self.player.rect.centery - rocket.rect.centery) <= danger_zone:
@@ -82,7 +82,7 @@ class Game(object):
         return self.near_misses
     
     def _is_on_target(self):
-        target_zone = 50
+        target_zone = 100
 
         for i, enemy in enumerate(self.states["GAMEPLAY"].all_enemies):
             if abs(self.player.rect.centerx - enemy.rect.centerx) <= target_zone:
@@ -103,21 +103,21 @@ class Game(object):
         enemy_points = enemies_killed * 10
 
         # Calculate time points
-        time_points = time_elapsed * 3 #math.floor(pow(10, 0.1 * time_elapsed)) - 1
+        time_points = math.floor(pow(10, 0.05 * time_elapsed)) - 1
 
         # Calculate near misses
-        near_miss_points = self._get_near_misses() * 6
+        near_miss_points = self._get_near_misses() * 5
 
         # Calculate rewards
         reward = rocket_points + enemy_points + time_points - near_miss_points
 
-        # Penalty for staying in the same place too long
-        if self.player.last_pos[0] == self.player.rect.centerx:
-            reward -= 2
+        # # Penalty for staying in the same place too long
+        # if self.player.last_pos[0] == self.player.rect.centerx:
+        #     reward -= 3
 
         # Reward for aiming at enemies
         if self._is_on_target():
-            reward += 20
+            reward += 100
 
         return reward
 
