@@ -122,12 +122,12 @@ class Game(object):
         return reward
 
     def get_info(self):
-        return {"Score": self.states["GAMEPLAY"].score}
+        return {"Score": self.states["GAMEPLAY"].score, "Time": round(time.time() - self.start_time)}
 
     def get_obs(self):
         # Convert data into a numpy array
-        score = self.states["GAMEPLAY"].score
-        time_elapsed = round(time.time() - self.start_time)
+        score = self.get_info()["Score"]
+        time_elapsed = self.get_info()["Time"]
         player_data = np.array([self.player.rect.centerx, self.player.rect.centery])
         shots_data = np.full((2, 4), -1)
         enemies_data = np.full((26, 2), -1)
