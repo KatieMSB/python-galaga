@@ -99,11 +99,11 @@ class Game(object):
         rocket_points = shots_fired + rockets_avoided
 
         # Calculate points earned for killing an enemy
-        enemy_points = math.floor(pow(500, 0.05 * enemies_killed)) + 19
+        enemy_points = min(math.floor(pow(1.1, enemies_killed)), 100)
 
         # Calculate time points
         if abs(self.player.rect.centerx - center) > 100:
-            time_points = math.floor(pow(10, 0.1 * time_elapsed)) - 1
+            time_points = min(math.floor(pow(1.1, time_elapsed)), 50)
         else:
             time_points = 0
 
