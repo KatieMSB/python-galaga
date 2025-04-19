@@ -97,10 +97,10 @@ class Game(object):
         rocket_points = shots_fired + rockets_avoided
 
         # Calculate points earned for killing an enemy
-        enemy_points = enemies_killed * 10
+        enemy_points = enemies_killed * 20
 
         # Calculate time points
-        time_points = math.floor(pow(10, 0.05 * time_elapsed)) - 1
+        time_points = math.floor(pow(10, 0.1 * time_elapsed)) - 1
 
         # Calculate near misses
         near_miss_points = self._get_near_misses() * 10
