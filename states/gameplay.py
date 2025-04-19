@@ -62,6 +62,7 @@ class Gameplay(BaseState):
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
         self.wave_count = 0
+        self.wave_number = 0
         self.enemies = 0
         self.number_of_enemies = 13
         self.score = 0
@@ -93,6 +94,7 @@ class Gameplay(BaseState):
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
         self.wave_count = 0
+        self.wave_number = 0
         self.enemies = 0
         self.number_of_enemies = 10
         self.score = 0
@@ -148,6 +150,7 @@ class Gameplay(BaseState):
             elif len(self.all_enemies) == 0:
                 self.enemies = 0
                 self.wave_count += 1
+                self.wave_number += 1
                 if self.wave_count > 2:
                     self.wave_count = 0
         if event.type == ENEMYSHOOTS:

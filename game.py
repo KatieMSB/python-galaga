@@ -21,6 +21,7 @@ class Game(object):
         self.sethighscore = False
         self.near_misses = 0
         self.player = self.states["GAMEPLAY"].player
+        self.time_off_center = time.time()
 
     def reset(self):
         self.done = False
@@ -31,8 +32,11 @@ class Game(object):
         self.state = self.states[self.state_name]
         self.near_misses = 0
         self.state.startup()
+        self.time_off_center = time.time()
 
     def event_loop(self):
+        self.player = self.states["GAMEPLAY"].player
+
         if self.state_name == "GAME_OVER" and not self.sethighscore:
             self.sethighscore = True
             self.death_time = round(time.time() - self.start_time)
@@ -73,28 +77,21 @@ class Game(object):
         self.state.draw(self.screen, self.final_metrics())
 
     def _get_near_misses(self):
-        danger_zone = 100
+        danger_zone = 50
 
         for i, rocket in enumerate(self.states["GAMEPLAY"].enemy_rockets):
             if abs(self.player.rect.centerx - rocket.rect.centerx) <= danger_zone and abs(self.player.rect.centery - rocket.rect.centery) <= danger_zone:
                 self.near_misses += 1
 
         return self.near_misses
-    
-    def _is_on_target(self):
-        target_zone = 100
-
-        for i, enemy in enumerate(self.states["GAMEPLAY"].all_enemies):
-            if abs(self.player.rect.centerx - enemy.rect.centerx) <= target_zone:
-                return True
-        
-        return False
 
     def _get_reward(self):
         enemies_killed = self.states["GAMEPLAY"].score // 120
         shots_fired = self.states["GAMEPLAY"].total_rocket_shot * 5
         rockets_avoided = self.states["GAMEPLAY"].rockets_avoided * 5
         time_elapsed = round(time.time() - self.start_time)
+        wave_count = self.states["GAMEPLAY"].wave_number
+        center = constants.SCREEN_WIDTH // 2
 
         # Calculate Rocket Points
         rocket_points = shots_fired + rockets_avoided
@@ -106,18 +103,20 @@ class Game(object):
         time_points = math.floor(pow(10, 0.05 * time_elapsed)) - 1
 
         # Calculate near misses
-        near_miss_points = self._get_near_misses() * 5
+        near_miss_points = self._get_near_misses() * 10
 
         # Calculate rewards
         reward = rocket_points + enemy_points + time_points - near_miss_points
 
-        # # Penalty for staying in the same place too long
-        # if self.player.last_pos[0] == self.player.rect.centerx:
-        #     reward -= 3
+        # Reward for reaching next wave
+        reward += wave_count * 100       
 
         # Reward for aiming at enemies
-        if self._is_on_target():
-            reward += 100
+        if abs(self.player.rect.centerx - center) > 100:
+            corner_time = round(time.time() - self.time_off_center)
+            reward -= corner_time * 15
+        else:
+            self.time_off_center = time.time()
 
         return reward
 
@@ -162,17 +161,23 @@ class Game(object):
             - Reward (int)
             - Done (bool)
         """
+        reward = self._get_reward()
+
         match action:
             case 1:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
+                print(f"Action: LEFT Reward: {reward}")
 
             case 2:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+                print(f"Action: RIGHT Reward: {reward}")
             
             case 3:
                 pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+                print(f"Action: SHOOT Reward: {reward}")
 
             case _:
+                print(f"Action: NONE Reward: {reward}")
                 None
 
         dt = self.clock.tick(self.fps)
@@ -183,10 +188,7 @@ class Game(object):
         self.draw()
         pygame.display.update()
         
-        reward = self._get_reward()
         done = self.done or self.state_name == "GAME_OVER"
-
-        print(f"Action: {action} Reward: {reward}")
 
         return reward, done
 
