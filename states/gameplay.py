@@ -37,7 +37,7 @@ def read_scores():
     integer_list.sort(reverse=True)
     return integer_list
 class Gameplay(BaseState):
-    def __init__(self, use_simple):
+    def __init__(self, use_simple, render_mode):
         super(Gameplay, self).__init__()
         pygame.time.set_timer(ADDENEMY, 450)
         pygame.time.set_timer(ENEMYSHOOTS, 1000)
@@ -85,10 +85,14 @@ class Gameplay(BaseState):
         self.total_rocket_shot = 0
         self.rockets_avoided = 0
         self.start_time = time.time()
+        self.render_mode = render_mode
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')
-        pygame.mixer.music.play()
+
+        if self.render_mode == "human":
+            pygame.mixer.music.play()
+            
         self.use_simple = False
         if self.use_simple:
             self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
@@ -106,6 +110,7 @@ class Gameplay(BaseState):
         self.all_enemies = pygame.sprite.Group()
         self.all_rockets = pygame.sprite.Group()
         self.enemy_rockets = pygame.sprite.Group()
+        
         self.shoot_sound = pygame.mixer.Sound("./assets/sounds/13 Fighter Shot1.mp3")
         self.kill_sound = pygame.mixer.Sound("./assets/sounds/kill.mp3")
         self.show_control = False
@@ -195,7 +200,9 @@ class Gameplay(BaseState):
         rocket.rect.centerx = self.player.rect.centerx
         self.all_rockets.add(rocket)
         self.all_sprites.add(rocket)
-        self.shoot_sound.play()
+        
+        if self.render_mode == "human":
+            self.shoot_sound.play()
 
     def enemy_shoots(self):
         nr_of_enemies = len(self.all_enemies)
@@ -252,7 +259,9 @@ class Gameplay(BaseState):
                 if self.score > self.high_score:
                     self.high_score = self.score
                 self.all_sprites.add(Explosion(self.explosion_sprites, key.rect[0], key.rect[1]))
-                self.kill_sound.play()
+
+                if self.render_mode == "human":
+                    self.kill_sound.play()
 
         result = pygame.sprite.spritecollideany(self.player, self.enemy_rockets)
         if result:
@@ -260,7 +269,10 @@ class Gameplay(BaseState):
             self.all_sprites.add(Explosion(self.explosion_sprites, result.rect[0] - 30, result.rect[1] - 30))
             self.all_sprites.add(Explosion(self.explosion_sprites, result.rect[0] + 30, result.rect[1] + 30))
             self.all_sprites.add(Explosion(self.explosion_sprites, result.rect[0], result.rect[1] - 30))
-            self.kill_sound.play()
+
+            if self.render_mode == "human":
+                self.kill_sound.play()
+
             self.freeze = True
             self.player.kill()
             self.is_dead = True

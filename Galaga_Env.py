@@ -32,11 +32,16 @@ class GalagaEnv(gym.Env):
 
     def _init_game(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+        
+        if self.render_mode == "rgb-array":
+            self.screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT), flags=pygame.HIDDEN)
+        else:
+            self.screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+
         self.clock = pygame.time.Clock()
 
         states = {
-            "GAMEPLAY": Gameplay(False),
+            "GAMEPLAY": Gameplay(False, self.render_mode),
             "GAME_OVER": GameOver()
         }
 

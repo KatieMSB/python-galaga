@@ -15,7 +15,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
 
-render_mode = "human"
+render_mode = "rgb-array"
 env = gym.make("Galaga-v0", render_mode=render_mode)
 
 
@@ -92,9 +92,9 @@ class DQN(nn.Module):
 # LR is the learning rate of the ``AdamW`` optimizer
 BATCH_SIZE = 128
 GAMMA = 0.99
-EPS_START = 0.9
-EPS_END = 0.01
-EPS_DECAY = 3000
+EPS_START = 1.0
+EPS_END = 0.05
+EPS_DECAY = 10000
 TAU = 0.005
 LR = 1e-4
 
@@ -251,6 +251,7 @@ for i_episode in range(num_episodes):
     #     T.ToTensor()
     # ])
 
+    print(f"Episode: {i_episode}")
     state, info = env.reset()
     # state = resize_transform(state).unsqueeze(0).to(device)
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
