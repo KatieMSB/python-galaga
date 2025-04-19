@@ -97,7 +97,7 @@ class Game(object):
         rocket_points = shots_fired + rockets_avoided
 
         # Calculate points earned for killing an enemy
-        enemy_points = math.floor(pow(10, 0.1 * enemies_killed)) + 9
+        enemy_points = math.floor(pow(10, 0.05 * enemies_killed)) + 19
 
         # Calculate time points
         time_points = math.floor(pow(10, 0.1 * time_elapsed)) - 1
@@ -112,11 +112,14 @@ class Game(object):
         reward += wave_count * 100       
 
         # Reward for aiming at enemies
+        corner_time = 0
         if abs(self.player.rect.centerx - center) > 100:
             corner_time = round(time.time() - self.time_off_center)
             reward -= corner_time * 15
         else:
             self.time_off_center = time.time()
+
+        print(f"Shots Fired: {shots_fired} Rockets Avoided: {rockets_avoided} Enemies: {enemy_points} Time: {time_points} Near Miss: {-1 * near_miss_points} Waves: {wave_count * 100} Corner: {corner_time}")
 
         return reward
 
