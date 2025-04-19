@@ -15,7 +15,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
 
-render_mode = "rgb-array"
+render_mode = "human"
 env = gym.make("Galaga-v0", render_mode=render_mode)
 
 
