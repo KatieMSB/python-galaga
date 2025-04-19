@@ -97,7 +97,7 @@ class Game(object):
         rocket_points = shots_fired + rockets_avoided
 
         # Calculate points earned for killing an enemy
-        enemy_points = enemies_killed * 20
+        enemy_points = math.floor(pow(10, 0.1 * enemies_killed)) + 9
 
         # Calculate time points
         time_points = math.floor(pow(10, 0.1 * time_elapsed)) - 1
