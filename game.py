@@ -102,7 +102,7 @@ class Game(object):
         enemy_points = min(math.floor(pow(1.1, enemies_killed)), 100)
 
         # Calculate time points
-        if abs(self.player.rect.centerx - center) > 100:
+        if abs(self.player.rect.centerx - center) < 100:
             time_points = min(math.floor(pow(1.1, time_elapsed)), 50)
         else:
             time_points = 0
