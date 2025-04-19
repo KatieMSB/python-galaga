@@ -1,4 +1,6 @@
 import numpy as np
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from typing import Optional
 import gymnasium as gym
