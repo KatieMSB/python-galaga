@@ -15,7 +15,7 @@ def run_game():
 
     screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
     states = {
-        "GAMEPLAY": Gameplay(True),
+        "GAMEPLAY": Gameplay(True, "human"),
         "GAME_OVER": GameOver(),
     }
 
@@ -27,7 +27,7 @@ def run_game():
 if __name__ == "__main__":
     multiprocessing.set_start_method("spawn") 
     
-    num_games = 1
+    num_games = 20
     processes = []
 
     for _ in range(num_games):

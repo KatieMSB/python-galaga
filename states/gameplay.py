@@ -58,8 +58,6 @@ class Gameplay(BaseState):
         self.control_sprites = pygame.sprite.Group()
         self.add_control_points()
         self.use_simple = use_simple
-        if use_simple:
-            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
         self.player = Player(self.sprites, self.use_simple)
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.player)
@@ -86,6 +84,8 @@ class Gameplay(BaseState):
         self.rockets_avoided = 0
         self.start_time = time.time()
         self.render_mode = render_mode
+        if use_simple:
+            self.agent = SimpleReflexAgent(self.player, self.enemy_rockets, self.all_enemies)
 
     def startup(self):
         pygame.mixer.music.load('./assets/sounds/02 Start Music.mp3')

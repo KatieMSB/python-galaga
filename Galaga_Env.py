@@ -11,7 +11,7 @@ from states.game_over import GameOver
 from game import Game
 
 class GalagaEnv(gym.Env):
-    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 60}
+    metadata = {"render_modes": ["human", "rgb-array"], "render_fps": 60}
 
     def __init__(self, render_mode=None):
         self.render_mode = render_mode
@@ -87,7 +87,7 @@ class GalagaEnv(gym.Env):
     def render(self):
         if self.render_mode == "human":
             pygame.display.flip()
-        elif self.render_mode == "rgb_array":
+        elif self.render_mode == "rgb-array":
             return self._get_obs()
         
     def close(self):

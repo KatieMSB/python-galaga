@@ -42,7 +42,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.left = 0
         if self.rect.right > constants.SCREEN_WIDTH:
             self.rect.right = constants.SCREEN_WIDTH
-
+        # with open("player_positions.txt", "a") as file:
+        #     file.write(f"{self.rect.centerx},{self.rect.centery}\n")
     def get_surf(self):
         if self.timer % self.interval == 0:
             self.image_index += 1

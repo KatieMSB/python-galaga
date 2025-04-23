@@ -33,7 +33,7 @@ device = torch.device(
     "cpu"
 )
 
-if render_mode == "rgb_array":
+if render_mode == "rgb-array":
     recording_interval = 100 # Record a video every 100 episodes
     env = RecordVideo(env, video_folder="Videos", name_prefix="training", episode_trigger=lambda x: x % recording_interval == 0)
     env = RecordEpisodeStatistics(env)
